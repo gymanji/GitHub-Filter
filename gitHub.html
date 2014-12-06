@@ -1,0 +1,100 @@
+<!doctype html>
+<html ng-app>
+<head>
+   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.27/angular.min.js"></script>
+   <meta charset="utf-8">
+   <meta http-equiv="Content-Type" content="text/html">
+   <title>Github App</title>
+</head>
+
+<body ng-controller="GitHubController as GitHubCtrl">
+<div>
+   <div>
+      <h1>Github API Fun</h1>
+      <input type="text" ng-model="login" placeholder="Github username...">
+      <button ng-click="getGithubInfo()">Search</button>
+   </div>
+
+   <div ng-show="userNotFound">
+      <h2>No User Info Found</h2>
+   </div>
+
+   <div ng-show="loaded">
+      <h2> {{user.name}}
+         <span class="smallname">@<a href="{{user.html_url}}" target="_blank"> {{user.login}} </a></span>
+      </h2>
+
+      <div>
+         <div>
+            <a href="{{user.html_url}}" target="_blank">
+               <img ng-src="{{user.avatar_url}}" width="80" height="80" alt="{{user.login}}">
+            </a>
+         </div>
+         <br>
+         Location: {{user.location}}<br>
+         Joined: {{user.created_at | date:shortDate}}<br>
+         Followers: {{user.followers}} &amp; Following: {{user.following}}<br>
+         Total Repos: {{user.public_repos}}
+      </div>
+
+      <div>
+         <p ng-hide="reposExist">No repos for this user!</p>
+
+         <div ng-show="reposExist">
+            <h3>
+               <span>
+                  <p>
+                     <strong>Repositories: </strong><input type="text" ng-model="search" placeholder="Search here...">
+                  </p>
+               </span>
+            </h3>
+            
+            <table>
+               <tr>
+                  <th>Name</th>
+                  <th>Watchers</th>
+                  <th>Last Updated</th>
+                  <th>Language</th>
+                  <th>Size</th>
+               </tr>
+               <tr ng-repeat="repo in repos | orderBy:-repo.watchers_count | filter: search">
+                  <td>
+                     <a href="{{repo.html_url}}" target="blank">{{repo.name}}</a>
+                  </td>
+                  <td>{{repo.watchers_count}}</td>
+                  <td>{{repo.updated_at | date:'M/d/yy'}}</td>
+                  <td>{{repo.language}}</td>
+                  <td>{{repo.size}}</td>
+               </tr>
+            </table>
+         </div>
+      </div>
+   </div>
+</div>
+
+<script>
+   function GitHubController($scope, $http) {
+      $scope.getGithubInfo = function () {
+         $scope.userNotFound = false;
+         $scope.loaded = false;
+         base_url = "https://api.github.com/users/";
+
+         $http.get(base_url + $scope.login)
+               .success(function (userData) {
+                  if (userData.name == "") userData.name = userData.login;
+                  $scope.user = userData;
+                  $scope.loaded = true;
+               })
+               .error(function () {
+                  $scope.userNotFound = true;
+               });
+         $http.get(base_url + $scope.login + "/repos").success(function (repoData) {
+            $scope.repos = repoData;
+            $scope.reposExist = repoData.length > 0;
+         });
+      }
+   }
+</script>
+
+</body>
+</html>
