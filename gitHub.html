@@ -44,7 +44,7 @@
             <h3>
                <span>
                   <p>
-                     <strong>Repositories: </strong><input type="text" ng-model="search" placeholder="Search here...">
+                     <strong>Repositories: </strong><input type="text" ng-model="search.name" placeholder="Search here...">
                   </p>
                </span>
             </h3>
@@ -57,7 +57,7 @@
                   <th>Language</th>
                   <th>Size</th>
                </tr>
-               <tr ng-repeat="repo in repos | orderBy:-repo.watchers_count | filter: search">
+               <tr ng-repeat="repo in repos | orderBy:-repo.watchers_count | filter:search">
                   <td>
                      <a href="{{repo.html_url}}" target="blank">{{repo.name}}</a>
                   </td>
